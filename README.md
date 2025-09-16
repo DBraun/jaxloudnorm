@@ -137,4 +137,3 @@ def test_batched_loudness_normalize():
 
 > Brecht De Man, "[Evaluation of Implementations of the EBU R128 Loudness Measurement](http://www.aes.org/e-lib/browse.cfm?elib=19790)," 
 > 145th International Convention of the Audio Engineering Society, October 2018. 
-
