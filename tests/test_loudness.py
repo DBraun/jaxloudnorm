@@ -11,7 +11,7 @@ data_dir = Path(__file__).parent / "data"
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_integrated_loudness(use_fir: bool):
-    data, rate = sf.read(data_dir / "sine_1000.wav")
+    data, rate = sf.read(str(data_dir / "sine_1000.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=4096)
     loudness = meter.integrated_loudness(data)
@@ -21,7 +21,7 @@ def test_integrated_loudness(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_batched_integrated_loudness(use_fir: bool):
-    data, rate = sf.read(data_dir / "sine_1000.wav")
+    data, rate = sf.read(str(data_dir / "sine_1000.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=4096)
     loudness = jax.vmap(meter.integrated_loudness)(jnp.stack([data, data, data]))
@@ -39,7 +39,7 @@ def test_peak_normalize(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_loudness_normalize(use_fir: bool):
-    data, rate = sf.read(data_dir / "sine_1000.wav")
+    data, rate = sf.read(str(data_dir / "sine_1000.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -51,7 +51,7 @@ def test_loudness_normalize(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_batched_loudness_normalize(use_fir: bool):
-    data, rate = sf.read(data_dir / "sine_1000.wav")
+    data, rate = sf.read(str(data_dir / "sine_1000.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     data = jnp.stack([data, data, data, data])
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
@@ -64,7 +64,7 @@ def test_batched_loudness_normalize(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_rel_gate_test(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_RelGateTest.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_RelGateTest.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -75,7 +75,7 @@ def test_rel_gate_test(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_abs_gate_test(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_AbsGateTest.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_AbsGateTest.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -86,7 +86,7 @@ def test_abs_gate_test(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_25Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_25Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_25Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=2048)
     loudness = meter.integrated_loudness(data)
@@ -97,7 +97,7 @@ def test_24LKFS_25Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_100Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_100Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_100Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -108,7 +108,7 @@ def test_24LKFS_100Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_500Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_500Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_500Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -119,7 +119,7 @@ def test_24LKFS_500Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_1000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_1000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_1000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -130,7 +130,7 @@ def test_24LKFS_1000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_2000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_2000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_2000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -141,7 +141,7 @@ def test_24LKFS_2000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_24LKFS_10000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_24LKFS_10000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_24LKFS_10000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -152,7 +152,7 @@ def test_24LKFS_10000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_25Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_25Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_25Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=2048)
     loudness = meter.integrated_loudness(data)
@@ -163,7 +163,7 @@ def test_23LKFS_25Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_100Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_100Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_100Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -174,7 +174,7 @@ def test_23LKFS_100Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_500Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_500Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_500Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -185,7 +185,7 @@ def test_23LKFS_500Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_1000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_1000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_1000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -196,7 +196,7 @@ def test_23LKFS_1000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_2000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_2000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_2000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -207,7 +207,7 @@ def test_23LKFS_2000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_23LKFS_10000Hz_2ch(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_23LKFS_10000Hz_2ch.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_23LKFS_10000Hz_2ch.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -218,7 +218,7 @@ def test_23LKFS_10000Hz_2ch(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_18LKFS_frequency_sweep(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Comp_18LKFS_FrequencySweep.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Comp_18LKFS_FrequencySweep.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -229,7 +229,7 @@ def test_18LKFS_frequency_sweep(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_conf_stereo_vinL_R_23LKFS(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Conf_Stereo_VinL+R-23LKFS.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Conf_Stereo_VinL+R-23LKFS.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -240,7 +240,7 @@ def test_conf_stereo_vinL_R_23LKFS(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_conf_monovoice_music_24LKFS(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Conf_Mono_Voice+Music-24LKFS.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Conf_Mono_Voice+Music-24LKFS.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -251,7 +251,7 @@ def test_conf_monovoice_music_24LKFS(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def conf_monovoice_music_24LKFS(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Conf_Mono_Voice+Music-24LKFS.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Conf_Mono_Voice+Music-24LKFS.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
@@ -262,7 +262,7 @@ def conf_monovoice_music_24LKFS(use_fir: bool):
 
 @pytest.mark.parametrize("use_fir", [False, True])
 def test_conf_monovoice_music_23LKFS(use_fir: bool):
-    data, rate = sf.read(data_dir / "1770-2_Conf_Mono_Voice+Music-23LKFS.wav")
+    data, rate = sf.read(str(data_dir / "1770-2_Conf_Mono_Voice+Music-23LKFS.wav"))
     data = data.T  # Convert from (T, C) to (C, T)
     meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
     loudness = meter.integrated_loudness(data)
