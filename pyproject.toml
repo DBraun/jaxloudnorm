@@ -49,7 +49,6 @@ docs = [
 
 [tool.setuptools]
 packages = ["jaxloudnorm"]
-exclude = ["docs*", "tests*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jaxloudnorm.__version__"}
