@@ -9,6 +9,15 @@ from .iirfilter import IIRfilter
 
 
 def _gated_mean(condition, x):
+    """Calculate mean of values where condition is True.
+
+    Args:
+        condition: Boolean array indicating which values to include.
+        x: Array of values to compute mean over.
+
+    Returns:
+        Array: Mean of values where condition is True.
+    """
     masked = jax.lax.select(
         jnp.broadcast_to(jnp.atleast_2d(condition), x.shape),
         x,
@@ -19,30 +28,25 @@ def _gated_mean(condition, x):
 
 
 class Meter:
-    """Meter object which defines how the meter operates
+    """Meter object which defines how the meter operates.
 
     Defaults to the algorithm defined in ITU-R BS.1770-4.
 
-    Parameters
-    ----------
-    rate : float
-        Sampling rate in Hz.
-    filter_class : str
-        Class of weighting filter used.
-        - 'K-weighting'
-        - 'Fenton/Lee 1'
-        - 'Fenton/Lee 2'
-        - 'Dash et al.'
-        - 'DeMan'
-    block_size : float
-        Gating block size in seconds.
-    zeros: int
-        Number of zeros to use in FIR approximation of IIR filters,
-        by default 512
-    use_fir: bool
-        Whether to use FIR approximation or exact IIR formulation.
-        If computing on GPU, ``use_fir=True`` is probably faster.
-        By default, ``use_fir`` is False.
+    Args:
+        rate: Sampling rate in Hz.
+        filter_class: Class of weighting filter used. Options:
+            - 'K-weighting' (default)
+            - 'Fenton/Lee 1'
+            - 'Fenton/Lee 2'
+            - 'Dash et al.'
+            - 'DeMan'
+            - 'custom'
+        block_size: Gating block size in seconds. Defaults to 0.400.
+        zeros: Number of zeros to use in FIR approximation of IIR filters.
+            Defaults to 512.
+        use_fir: Whether to use FIR approximation or exact IIR formulation.
+            If computing on GPU, ``use_fir=True`` is probably faster.
+            Defaults to False.
     """
 
     def __init__(
@@ -56,37 +60,37 @@ class Meter:
         self.block_size = block_size
 
     def integrated_loudness(
-        self, input_data: Union[Float[Array, "time channels"], Float[Array, "time"]]
+        self, input_data: Union[Float[Array, "channels time"], Float[Array, "time"]]
     ) -> Scalar:
         """Measure the integrated gated loudness of a signal.
 
-        Uses the weighting filters and block size defined by the meter
-        the integrated loudness is measured based upon the gating algorithm
+        Uses the weighting filters and block size defined by the meter.
+        The integrated loudness is measured based upon the gating algorithm
         defined in the ITU-R BS.1770-4 specification.
 
-        Input data must have shape (samples, ch) or (samples,) for mono audio.
+        Input data must have shape (channels, samples) or (samples,) for mono audio.
         Supports up to 5 channels and follows the channel ordering:
         [Left, Right, Center, Left surround, Right surround]
 
-        Params
-        -------
-        data : ndarray
-            Input multichannel audio data.
+        Args:
+            input_data: Input multichannel audio data with shape (channels, samples)
+                or (samples,) for mono audio.
 
-        Returns
-        -------
-        LUFS : float
-            Integrated gated loudness of the input measured in dB LUFS.
+        Returns:
+            float: Integrated gated loudness of the input measured in dB LUFS.
         """
         util.valid_audio(input_data, self.rate, self.block_size)
 
-        input_data = jnp.atleast_2d(jnp.asarray(input_data).T).T
+        # Handle mono audio: convert (samples,) to (1, samples)
+        input_data = jnp.asarray(input_data)
+        if input_data.ndim == 1:
+            input_data = input_data[jnp.newaxis, :]
 
-        num_samples, num_channels = input_data.shape
+        num_channels, num_samples = input_data.shape
 
         # Apply frequency weighting filters - account for the acoustic response of the head and auditory system
         for filter_stage in self._filters:
-            input_data = filter_stage.apply_filter(input_data, axis=0)
+            input_data = filter_stage.apply_filter(input_data, axis=-1)
 
         g = jnp.array([1.0, 1.0, 1.0, 1.41, 1.41])  # channel gains
         gating_len_s = self.block_size  # 400 ms gating block standard
@@ -109,16 +113,17 @@ class Meter:
         slice_max_len = indices[0][1] - indices[0][0]
         input_slices = jnp.asarray(
             [
-                jnp.zeros((slice_max_len, input_data.shape[1]))
-                .at[: input_data[l:u, ...].shape[0], ...]
-                .set(input_data[l:u, ...])
+                jnp.zeros((input_data.shape[0], slice_max_len))
+                .at[..., : input_data[..., l:u].shape[-1]]
+                .set(input_data[..., l:u])
                 for l, u in indices
             ]
         )
+        # z shape: (channels, num_blocks)
         z = (
             jnp.reciprocal(gating_len_s * self.rate)
-            * jnp.sum(jnp.square(input_slices), axis=1).T
-        )
+            * jnp.sum(jnp.square(input_slices), axis=2)
+        ).T
 
         # loudness for each jth block (see eq. 4)
         loudness_per_block = -0.691 + 10.0 * jnp.log10(

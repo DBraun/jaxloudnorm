@@ -1,24 +1,18 @@
 import warnings
 import jax.numpy as jnp
-import jax
 
 
 def peak(data, target):
     """Peak normalize a signal.
 
-    Normalize an input signal to a user specifed peak amplitude.
+    Normalize an input signal to a user specified peak amplitude.
 
-    Params
-    -------
-    data : ndarray
-        Input multichannel audio data.
-    target : float
-        Desired peak amplitude in dB.
+    Args:
+        data: Input multichannel audio data.
+        target: Desired peak amplitude in dB.
 
-    Returns
-    -------
-    output : ndarray
-        Peak normalized output data.
+    Returns:
+        ndarray: Peak normalized output data.
     """
     # find the amplitude of the largest peak
     current_peak = jnp.max(jnp.abs(data))
@@ -37,21 +31,15 @@ def peak(data, target):
 def loudness(data, input_loudness, target_loudness):
     """Loudness normalize a signal.
 
-    Normalize an input signal to a user loudness in dB LKFS.
+    Normalize an input signal to a target loudness in dB LUFS.
 
-    Params
-    -------
-    data : ndarray
-        Input multichannel audio data.
-    input_loudness : float
-        Loudness of the input in dB LUFS.
-    target_loudness : float
-        Target loudness of the output in dB LUFS.
+    Args:
+        data: Input multichannel audio data.
+        input_loudness: Loudness of the input in dB LUFS.
+        target_loudness: Target loudness of the output in dB LUFS.
 
-    Returns
-    -------
-    output : ndarray
-        Loudness normalized output data.
+    Returns:
+        ndarray: Loudness normalized output data.
     """
     # calculate the gain needed to scale to the desired loudness level
     delta_loudness = target_loudness - input_loudness

@@ -1,9 +1,6 @@
-`s/np/jnp/g`
-`s/py/jax/g`
-
 Docs below are from the [original repo](https://github.com/csteinmetz1/pyloudnorm) for the most part.
 
-# jaxloudnorm  [![Build Status](https://travis-ci.org/csteinmetz1/pyloudnorm.svg?branch=master)](https://travis-ci.org/csteinmetz1/pyloudnorm) ![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.3551801.svg)
+# jaxloudnorm  ![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.3551801.svg)
 Flexible audio loudness meter in Python. 
 
 Implementation of [ITU-R BS.1770-4](https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.1770-4-201510-I!!PDF-E.pdf). <br/>
@@ -12,9 +9,9 @@ Allows control over gating block size and frequency weighting filters for additi
 For full details on the implementation see our [paper](https://csteinmetz1.github.io/pyloudnorm-eval/paper/pyloudnorm_preprint.pdf) with a summary in our [AES presentation video](https://www.youtube.com/watch?v=krSJpQ3d4gE).
 
 ## Installation
-Install from GitHub repo using
-```
-pip install git+https://github.com/boris-kuz/jaxloudnorm
+Install from PyPI:
+```bash
+pip install jaxloudnorm
 ```
 ## Usage
 
@@ -26,6 +23,7 @@ import soundfile as sf
 import jaxloudnorm as jln
 
 data, rate = sf.read("test.wav") # load audio (with shape (samples, channels))
+data = data.T # convert to (channels, samples) for jaxloudnorm
 meter = jln.Meter(rate) # create BS.1770 meter
 loudness = meter.integrated_loudness(data) # measure loudness
 ```
@@ -37,7 +35,7 @@ import soundfile as sf
 import jaxloudnorm as jln
 
 data, rate = sf.read("test.wav") # load audio
-
+data = data.T # convert to (channels, samples) for jaxloudnorm
 # peak normalize audio to -1 dB
 peak_normalized_audio = jln.normalize.peak(data, -1.0)
 
@@ -50,14 +48,15 @@ loudness_normalized_audio = jln.normalize.loudness(data, loudness, -12.0)
 ```
 
 ### Advanced operation
-A number of alternate weighting filters are available, as well as the ability to adjust the analysis block size. 
+A number of alternate weighting filters are available, as well as the ability to adjust the analysis block size.
 Examples are shown below.
 ```python
 import soundfile as sf
 import jaxloudnorm as jln
 from jaxloudnorm import IIRfilter
 
-data, rate = sf.read("test.wav") # load audio
+data, rate = sf.read("test.wav") # load audio (with shape (samples, channels))
+data = data.T # convert to (channels, samples) for jaxloudnorm
 
 # block size
 meter1 = jln.Meter(rate)                               # 400ms block size
@@ -94,6 +93,7 @@ Examples from tests:
 ``` python
 def test_batched_integrated_loudness():
     data, rate = sf.read("tests/data/sine_1000.wav")
+    data = data.T # convert to (channels, samples) for jaxloudnorm
     meter = pyln.Meter(rate)
     loudness = jax.vmap(meter.integrated_loudness)(jnp.stack([data, data, data]))
 
@@ -101,6 +101,7 @@ def test_batched_integrated_loudness():
 
 def test_batched_loudness_normalize():
     data, rate = sf.read("tests/data/sine_1000.wav")
+    data = data.T # convert to (channels, samples) for jaxloudnorm
     data = jnp.stack([data, data, data, data])
     meter = pyln.Meter(rate)
     loudness = jax.vmap(meter.integrated_loudness)(data)
