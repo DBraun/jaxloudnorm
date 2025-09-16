@@ -21,7 +21,7 @@ def test_loudness(
         return loudness
 
     data = jax.random.uniform(jax.random.key(0),
-                              shape=(batch_size, int(rate*seconds), channels),
+                              shape=(batch_size, channels, int(rate*seconds)),
                               minval=-0.5,
                               maxval=0.5)
 

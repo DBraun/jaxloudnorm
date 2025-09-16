@@ -1,27 +1,25 @@
 def valid_audio(data, rate, block_size):
     """Validate input audio data.
 
-    Ensure input is numpy array of floating point data bewteen -1 and 1
+    Ensure input has valid dimensions and sufficient length for analysis.
 
-    Params
-    -------
-    data : ndarray
-        Input audio data
-    rate : int
-        Sampling rate of the input audio in Hz
-    block_size : int
-        Analysis block size in seconds
+    Args:
+        data: Input audio data with shape (channels, samples) or (samples,) for mono.
+        rate: Sampling rate of the input audio in Hz.
+        block_size: Analysis block size in seconds.
 
-    Returns
-    -------
-    valid : bool
-        True if valid audio
+    Returns:
+        bool: True if valid audio.
 
+    Raises:
+        ValueError: If audio has more than 5 channels or length is less than block size.
     """
-    if data.ndim == 2 and data.shape[1] > 5:
+    if data.ndim == 2 and data.shape[0] > 5:
         raise ValueError("Audio must have five channels or less.")
 
-    if data.shape[0] < block_size * rate:
+    # For (C, T) format, time is the last dimension
+    time_axis = -1 if data.ndim == 2 else 0
+    if data.shape[time_axis] < block_size * rate:
         raise ValueError("Audio must have length greater than the block size.")
 
     return True
