@@ -24,7 +24,11 @@ def _gated_mean(condition, x):
         jnp.zeros_like(x),
     )
     not_zero = jnp.count_nonzero(masked, axis=1)
-    return jnp.sum(masked, axis=1) / not_zero
+    # When no block passes the gate (e.g. digital silence), the sum is 0 and so
+    # is the count; guard the 0/0 so it yields 0 rather than NaN. Downstream this
+    # becomes ``log10(0) = -inf``, the correct loudness for silence, instead of
+    # poisoning the result with NaN.
+    return jnp.sum(masked, axis=1) / jnp.maximum(not_zero, 1)
 
 
 class Meter:
