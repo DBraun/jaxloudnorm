@@ -30,6 +30,29 @@ def test_batched_integrated_loudness(use_fir: bool):
 
 
 @pytest.mark.parametrize("use_fir", [False, True])
+def test_silence_is_neg_inf(use_fir: bool):
+    rate = 44100
+    silence = jnp.zeros((1, rate))  # 1 s of digital silence, (channels, time)
+    meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
+    loudness = meter.integrated_loudness(silence)
+
+    # Zero gated power -> -inf LUFS, not NaN (no gating block passes -70 LKFS).
+    assert loudness == -jnp.inf
+    assert not jnp.isnan(loudness)
+
+
+@pytest.mark.parametrize("use_fir", [False, True])
+def test_batched_silence_is_neg_inf(use_fir: bool):
+    rate = 44100
+    silence = jnp.zeros((3, 1, rate))  # batch of 3 mono silent signals
+    meter = pyln.Meter(rate, use_fir=use_fir, zeros=1024)
+    loudness = jax.vmap(meter.integrated_loudness)(silence)
+
+    assert jnp.all(loudness == -jnp.inf)
+    assert not jnp.any(jnp.isnan(loudness))
+
+
+@pytest.mark.parametrize("use_fir", [False, True])
 def test_peak_normalize(use_fir: bool):
     data = jnp.array(0.5)
     norm = pyln.normalize.peak(data, 0.0)

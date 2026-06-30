@@ -63,6 +63,12 @@ Contents
    api/lfilter
    api/util
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Project
+
+   changelog
+
 Indices and tables
 ==================
 
