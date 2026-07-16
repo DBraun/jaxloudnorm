@@ -118,7 +118,8 @@ def test_batched_loudness_normalize():
 - **NumPy** ([http://www.numpy.org/](http://www.numpy.org/))
 - **JAX** ([https://jax.readthedocs.io/en/latest/index.html](https://jax.readthedocs.io/en/latest/index.html))
 - **jaxtyping** ([https://docs.kidger.site/jaxtyping/](https://docs.kidger.site/jaxtyping/))
-- **python-soundfile** ([https://github.com/bastibe/python-soundfile](https://github.com/bastibe/python-soundfile))
+
+The examples above read audio with **python-soundfile** ([https://github.com/bastibe/python-soundfile](https://github.com/bastibe/python-soundfile)), which jaxloudnorm itself does not require. Install it with `pip install soundfile` if you want to load files the same way.
 
 
 ## References
